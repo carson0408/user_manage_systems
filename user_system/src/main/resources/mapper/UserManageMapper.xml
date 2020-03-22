@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carson.cachedemo.mapper.UserManageMapper">
+
+    <!--根据userid查询用户记录-->
+    <select id="findByUserid" parameterType="int" resultType="com.carson.cachedemo.entity.User">
+        select * from t_user where userid=#{userid}
+    </select>
+
+
+    <!--查询所有用户记录-->
+    <select id="findAllUser" resultMap="allUserMap">
+        select * from t_user order by userid
+    </select>
+    <resultMap id="allUserMap" type="com.carson.cachedemo.entity.User">
+        <id property="userid" column="userid" />
+        <result property="username" column="username" />
+        <result property="passwd" column="passwd" />
+        <result property="age" column="age" />
+        <result property="creattime" column="creattime" />
+    </resultMap>
+
+
+    <!--根据userid删除用户记录-->
+    <delete id="deleteByUserid" parameterType="int">
+        delete from t_user where userid=#{userid}
+    </delete>
+
+
+    <!--插入用户记录-->
+    <insert id = "insertUser" useGeneratedKeys="false" keyProperty="userid" parameterType="com.carson.cachedemo.entity.User">
+        insert t_user(userid,username,passwd,age) values(#{userid},#{username},#{passwd},#{age})
+
+    </insert>
+
+    <update id="updateUser" parameterType="com.carson.cachedemo.entity.User">
+        update t_user set username=#{username},passwd=#{passwd},age=#{age} where userid=#{userid}
+    </update>
+
+
+    <resultMap id="friendMap" type="com.carson.cachedemo.entity.Friends">
+
+            <id property="userid" column="userid" />
+
+            <collection property="friendInfos" ofType="com.carson.cachedemo.entity.UserInfo">
+                <id property="userid" column="friendid"/>
+                <result property="username" column="username"/>
+
+                <result property="age" column="age" />
+            </collection>
+
+    </resultMap>
+    <select id="getFriends" resultMap="friendMap">
+        select temp.uid  userid,temp.fid friendid,t_user.username,t_user.age from t_user, (select t_user.userid uid,relation.friendid fid from t_user,relation where t_user.userid = relation.userid) as temp where temp.fid=t_user.userid
+    </select>
+
+    <select id="getFriendsByUserid" parameterType="int" resultMap="friendMap">
+        select t.userid,t.friendid,t.username,t.age from (select temp.uid  userid,temp.fid friendid,t_user.username username,t_user.age age from t_user, (select t_user.userid uid,relation.friendid fid from t_user,relation where t_user.userid = relation.userid) as temp where temp.fid=t_user.userid) as t where t.userid=#{userid}
+    </select>
+
+    <!--添加好友-->
+    <insert id="insertFriend" useGeneratedKeys="true" keyProperty="id" parameterType="com.carson.cachedemo.entity.Relation">
+        insert into relation(userid,friendid) values(#{userid},#{friendid})
+    </insert>
+
+
+    <!--根据userid查询用户记录-->
+    <select id="findByFriendid" parameterType="int" resultType="com.carson.cachedemo.entity.User">
+        select * from t_user where userid=#{friendid}
+    </select>
+
+
+    <delete id="deleteFriend" parameterType="com.carson.cachedemo.entity.Relation">
+        delete from relation where userid=#{userid} and friendid=#{friendid}
+    </delete>
+
+    <delete id="deleteFriendByUserid" parameterType="int">
+        delete from relation where userid = #{userid}
+    </delete>
+
+    <delete id="deleteFriendByFriendid" parameterType="int">
+        delete from relation where friendid = #{userid}
+    </delete>
+
+
+    <select id="getRelation" parameterType="com.carson.cachedemo.entity.Relation" resultType="com.carson.cachedemo.entity.Relation">
+        select * from relation where userid=#{userid} and friendid=#{friendid}
+    </select>
+
+    <select id="searchForLogin" parameterType="com.carson.cachedemo.entity.Login" resultType="com.carson.cachedemo.entity.User">
+        select * from t_user where username=#{username} and passwd=#{passwd}
+    </select>
+
+</mapper>
