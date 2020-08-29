@@ -2,6 +2,9 @@ package com.carson.cachedemo.controller;
 
 
 import com.carson.cachedemo.Enum.Result;
+import com.carson.cachedemo.annotation.Limit;
+import com.carson.cachedemo.annotation.LogInfo;
+import com.carson.cachedemo.aspect.LogType;
 import com.carson.cachedemo.commons.ResponseDTO;
 import com.carson.cachedemo.entity.Friends;
 import com.carson.cachedemo.entity.Login;
@@ -51,6 +54,14 @@ public class UserManageController {
     @PostConstruct
     private void init(){
 
+    }
+
+
+    @RequestMapping("/test")
+    @LogInfo(time =0,info = "请求测试",logtype = LogType.ERROR)
+    @Limit(key = "test", period = 60, count = 10, name = "testLimit", prefix = "limit")
+    public void testLimit(){
+        System.out.println("测试注解功能");
     }
 
 

@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p></p>
@@ -57,7 +59,6 @@ public class UserManageServiceImpl implements UserManageService{
     @Transactional(propagation = Propagation.REQUIRED,readOnly = false)
     @CacheEvict(value = "user",key = "#userid")
     public int deleteUser(int userid) {
-
         int res2 = userManageMapper.deleteFriendByUserid(userid);
         int res3= userManageMapper.deleteFriendByFriendid(userid);
         int res1= userManageMapper.deleteByUserid(userid);
